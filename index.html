@@ -520,7 +520,7 @@
     <script>
         (function () {
             // Elements
-            const WINDY_API_KEY = CONFIG.WINDY_API_KEY; // Get free key from  
+            const WINDY_API_KEY = (CONFIG.WINDY_API_KEY || "").trim(); // Get free key from  
 
             const cityInput = document.getElementById('city');
             const searchBtn = document.getElementById('search-btn');
@@ -552,7 +552,7 @@
 
             // API Key for WeatherAPI.com
             // Get your own free key at https://www.weatherapi.com/
-            const KEY = CONFIG.WEATHER_API_KEY;
+            const KEY = (CONFIG.WEATHER_API_KEY || "").trim();
 
             // Helper to get emoji/icon based on code
             function getRetroIcon(code, isDay) {
@@ -931,6 +931,7 @@
                     conditionText.textContent = "SPELL FAILED";
                     tempDisplay.textContent = "--°C";
                     alert("Wizard Error: " + e.message + "\n\n(Check your internet connection or API key)");
+                    console.warn("API Key used (last 4 chars): ..." + KEY.slice(-4)); // Debug helper
                 } finally {
                     loader.style.display = 'none';
                 }
