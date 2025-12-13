@@ -387,6 +387,37 @@
                 transform: translateX(-10vw) rotate(360deg);
             }
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .window {
+                max-width: 95%;
+                margin: 10px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .webcam-frame {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16/9;
+            }
+
+            .title-bar-text {
+                font-size: 18px;
+            }
+
+            .header-image-container {
+                height: 100px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                /* 2 cols for better space usage on mobile if single column panel */
+            }
+        }
     </style>
 </head>
 
