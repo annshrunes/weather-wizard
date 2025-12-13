@@ -478,6 +478,8 @@
                     <div class="webcam-frame">
                         <img src="webcam.png" alt="Live Webcam">
                     </div>
+                    <div id="webcam-status" style="font-size:12px; margin-top:5px; color:#ff5555; min-height:16px;">
+                    </div>
                     <div
                         style="width:100%; height:10px; background:#ccc; margin-top:5px; border:1px solid #555; position:relative;">
                         <div style="width:10px; height:8px; background:#555; position:absolute; right:2px; top:0;">
@@ -574,13 +576,23 @@
             closeModal.onclick = () => { modal.style.display = 'none'; };
             modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
+            const webcamStatus = document.getElementById('webcam-status');
+
             // Fetch Webcam from Windy API
             async function fetchWebcam(lat, lon) {
                 webcamImg.parentElement.style.cursor = "wait"; // Indicate loading
+                if (webcamStatus) {
+                    webcamStatus.textContent = "SEARCHING...";
+                    webcamStatus.style.color = "#ffff00";
+                }
 
                 if (WINDY_API_KEY === "YOUR_WINDY_KEY_HERE") {
                     console.log("Windy API Key missing.");
                     webcamImg.parentElement.style.cursor = "default";
+                    if (webcamStatus) {
+                        webcamStatus.textContent = "API KEY MISSING";
+                        webcamStatus.style.color = "#ff5555";
+                    }
                     return;
                 }
 
@@ -609,6 +621,11 @@
                         webcamImg.src = imgSrc;
                         webcamImg.alt = cam.title;
 
+                        if (webcamStatus) {
+                            webcamStatus.textContent = cam.title.substring(0, 25);
+                            webcamStatus.style.color = "#00ff00";
+                        }
+
                         // Setup Modal Interaction
                         webcamImg.parentElement.style.cursor = "pointer";
                         webcamImg.parentElement.onclick = () => {
@@ -619,10 +636,18 @@
                     } else {
                         console.log("No webcams found nearby.");
                         webcamImg.parentElement.style.cursor = "default";
+                        if (webcamStatus) {
+                            webcamStatus.textContent = "NO CAMS FOUND";
+                            webcamStatus.style.color = "#ff5555";
+                        }
                     }
                 } catch (err) {
                     console.warn("Webcam fetch error using V3:", err);
                     webcamImg.parentElement.style.cursor = "not-allowed";
+                    if (webcamStatus) {
+                        webcamStatus.textContent = "ERR: " + err.message;
+                        webcamStatus.style.color = "#ff5555";
+                    }
                 }
             }
 
