@@ -585,22 +585,35 @@
                 }
 
                 try {
-                    const url = `https://api.windy.com/api/webcams/v2/list/nearby=${lat},${lon},20?show=webcams:image&key=${WINDY_API_KEY}`;
-                    const res = await fetch(url);
-                    if (!res.ok) throw new Error("Webcam API Failed");
+                    // V3 API: Use 'nearby' parameter and 'include' for images/location
+                    // Radius is in km.
+                    const url = `https://api.windy.com/webcams/api/v3/webcams?nearby=${lat},${lon},20&include=images,location&limit=1`;
+
+                    const res = await fetch(url, {
+                        headers: {
+                            'x-windy-api-key': WINDY_API_KEY
+                        }
+                    });
+
+                    if (!res.ok) throw new Error("Webcam API Failed: " + res.status);
                     const data = await res.json();
 
-                    if (data.result && data.result.webcams && data.result.webcams.length > 0) {
-                        // Pick the first one
-                        const cam = data.result.webcams[0];
-                        webcamImg.src = cam.image.current.preview; // or .daylight
+                    // V3 Response: { webcams: [...] }
+                    if (data.webcams && data.webcams.length > 0) {
+                        const cam = data.webcams[0];
+
+                        // V3 Image structure: cam.images.current.preview
+                        // Fallback to other sizes if needed, but 'preview' or 'icon' usually exist.
+                        const imgSrc = cam.images.current.preview || cam.images.current.icon;
+
+                        webcamImg.src = imgSrc;
                         webcamImg.alt = cam.title;
 
                         // Setup Modal Interaction
                         webcamImg.parentElement.style.cursor = "pointer";
                         webcamImg.parentElement.onclick = () => {
                             modal.style.display = 'flex';
-                            modalImg.src = cam.image.current.preview; // Could use fuller resolution if available
+                            modalImg.src = imgSrc;
                             modalCaption.textContent = cam.title + " (" + cam.status + ")";
                         };
                     } else {
@@ -608,10 +621,11 @@
                         webcamImg.parentElement.style.cursor = "default";
                     }
                 } catch (err) {
-                    console.warn("Webcam fetch error:", err);
+                    console.warn("Webcam fetch error using V3:", err);
                     webcamImg.parentElement.style.cursor = "not-allowed";
                 }
             }
+
 
             // Helper for Header Image path
             // Randomly selects from available images for each condition
